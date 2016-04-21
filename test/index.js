@@ -3,6 +3,7 @@ var rimraf = require('rimraf');
 var assert = require('assert');
 var equal = require('assert-dir-equal');
 var Metalsmith = require('metalsmith');
+var moment = require('moment');
 var permalinks = require('..');
 
 describe('metalsmith-permalinks', function(){
@@ -170,6 +171,25 @@ describe('metalsmith-permalinks', function(){
       .build(function(err){
         if (err) return done(err);
         equal('test/fixtures/linkset-custom-date/expected', 'test/fixtures/linkset-custom-date/build');
+        done();
+      });
+  });
+
+  it('should format a moment object as a date', function(done){
+    Metalsmith('test/fixtures/moment')
+      .use(function(files, metalsmith, done){
+        Object.keys(files).forEach(function(file){
+          var data = files[file];
+          if (data && data.date) {
+            data.date = moment(data.date);
+          }
+        });
+        done();
+      })
+      .use(permalinks(':date'))
+      .build(function(err){
+        if (err) return done(err);
+        equal('test/fixtures/moment/expected', 'test/fixtures/moment/build');
         done();
       });
   });
